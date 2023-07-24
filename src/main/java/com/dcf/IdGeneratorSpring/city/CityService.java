@@ -33,11 +33,7 @@ private final CityRepository cityRepository;
             city.setSequence(sequence);
             cityRepository.save(city);
             //
-            int sequenceB =  cityB.getSequence()+1;
-            cityB.setSequence(sequenceB);
-            cityRepository.save(cityB);
-            //
-            String id = calcCheckSum(city.getCityCode()+"-"+sequence)+"-"+cityB.getCityCode()+"-"+sequenceB;
+            String id = calcCheckSum(city.getCityCode()+"-"+String.format("%06d", sequence))+"-"+cityB.getCityCode();
                 System.out.println("City Id: " + id );
             } else {
                 System.out.println("Invalid City Params " );
