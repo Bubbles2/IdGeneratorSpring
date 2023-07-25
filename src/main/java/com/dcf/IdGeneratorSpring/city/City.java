@@ -1,6 +1,6 @@
 package com.dcf.IdGeneratorSpring.city;
-
 import jakarta.persistence.*;
+import com.dcf.IdGeneratorSpring.EntityManagerHelper;
 import lombok.Data;
 
 
@@ -20,8 +20,19 @@ public class City {
     private String name;
     private String cityCode;
     private Integer sequence;
+    @PrePersist
+    public void onPrePersist() {
+        System.out.println("onPrePersist");
+        EntityManager entityManager = EntityManagerHelper.getEntityManager();
+        this.sequence = ((Number) entityManager.createNativeQuery("SELECT nextval('paris_sequence')").getSingleResult()).intValue();
+    }
 
     public City() {
+    }
+
+    public City(String name, String cityCode) {
+        this.name = name;
+        this.cityCode = cityCode;
     }
 
     public City(String name, String cityCode, Integer sequence) {
