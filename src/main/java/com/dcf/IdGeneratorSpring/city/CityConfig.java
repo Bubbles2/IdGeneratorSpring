@@ -16,12 +16,11 @@ public class CityConfig {
 @Autowired
 private JdbcTemplate jdbcTemplate;
     @Bean
-    CommandLineRunner commandLineRunner(CityRepository cityRepository) {
+    CommandLineRunner commandLineRunner(CityRepository cityRepository, CityService cityService) {
         return args -> {
 // Save wont work because resets default value to null
  //           jdbcTemplate.update("INSERT INTO City(name, cityCode) VALUES (?, ?)", "Paris", "99");
             City paris = new City("Paris", "01");
-            City lyon = new City("Lyon", "69");
             City marseille = new City( "Marseille","12");
 
 
@@ -31,9 +30,12 @@ private JdbcTemplate jdbcTemplate;
 //                        .setParameter(2, "01")
 //                        .executeUpdate();
 
-            cityRepository.save(paris);
-            cityRepository.save(lyon);
-            cityRepository.save(marseille);
+//            cityRepository.save(paris);
+//            cityRepository.save(lyon);
+//            cityRepository.save(marseille);
+
+            cityService.saveCity(paris, "paris_sequence");
+             cityService.saveCity(marseille, "marseille_sequence");
         };
     }
 }

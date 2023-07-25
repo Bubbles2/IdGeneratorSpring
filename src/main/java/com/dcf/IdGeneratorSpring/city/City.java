@@ -20,12 +20,12 @@ public class City {
     private String name;
     private String cityCode;
     private Integer sequence;
-    @PrePersist
-    public void onPrePersist() {
-        System.out.println("onPrePersist");
-        EntityManager entityManager = EntityManagerHelper.getEntityManager();
-        this.sequence = ((Number) entityManager.createNativeQuery("SELECT nextval('paris_sequence')").getSingleResult()).intValue();
-    }
+//    @PrePersist
+//    public void onPrePersist() {
+//        System.out.println("onPrePersist");
+//        EntityManager entityManager = EntityManagerHelper.getEntityManager();
+//        this.sequence = ((Number) entityManager.createNativeQuery("SELECT nextval('paris_sequence')").getSingleResult()).intValue();
+//    }
 
     public City() {
     }

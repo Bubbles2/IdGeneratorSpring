@@ -1,7 +1,8 @@
 package com.dcf.IdGeneratorSpring.city;
+import com.dcf.IdGeneratorSpring.DatabaseSetupService;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -11,9 +12,16 @@ import java.util.Optional;
 @Service
 public class CityService {
 private final CityRepository cityRepository;
-@Autowired
-    public CityService(CityRepository cityRepository) {
+    private EntityManager entityManager;
+    private DatabaseSetupService databaseSetupService;
+
+
+
+    @Autowired
+    public CityService(CityRepository cityRepository, EntityManager entityManager, DatabaseSetupService databaseSetupService) {
         this.cityRepository = cityRepository;
+        this.entityManager = entityManager;
+        this.databaseSetupService = databaseSetupService;
     }
     public List<City> getCities() {
         return cityRepository.findAll();
@@ -39,7 +47,10 @@ private final CityRepository cityRepository;
                 System.out.println("City Id: " + id );
              return id ;
             } else {
-            return "Error";
+            City city = new City(city1, "**");
+            databaseSetupService.createSequence( String.format("%s_sequence", city1));
+            saveCity(city, String.format("%s_sequence", city1));
+            return "Create City First";
             }
         }
 
@@ -59,5 +70,14 @@ private final CityRepository cityRepository;
             System.out.println("Error: " + ex.getMessage());
             return "Error";
         }
+    }
+    @Transactional
+    public void saveCity(City city, String sequenceName) {
+        city.setSequence(getNextSequenceValue(sequenceName));
+        cityRepository.save(city);
+    }
+
+    private Integer getNextSequenceValue(String sequenceName) {
+         return ((Number) entityManager.createNativeQuery("SELECT nextval('" + sequenceName + "')").getSingleResult()).intValue();
     }
 }
