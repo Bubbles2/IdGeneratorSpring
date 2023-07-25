@@ -1,5 +1,7 @@
 package com.dcf.IdGeneratorSpring.city;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -22,7 +24,7 @@ private final CityRepository cityRepository;
     }
 
 
-    public void generateId(String city1, String city2) {
+    public String generateId(String city1, String city2) {
         Optional<City> cit = cityRepository.findCityByName(city1);
         Optional<City> citB = cityRepository.findCityByName(city2);
         if (cit.isPresent() && citB.isPresent()) {
@@ -35,8 +37,9 @@ private final CityRepository cityRepository;
             //
             String id = calcCheckSum(city.getCityCode()+"-"+String.format("%06d", sequence))+"-"+cityB.getCityCode();
                 System.out.println("City Id: " + id );
+             return id ;
             } else {
-                System.out.println("Invalid City Params " );
+            return "Error";
             }
         }
 

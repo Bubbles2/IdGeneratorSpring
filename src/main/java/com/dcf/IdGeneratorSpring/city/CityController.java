@@ -1,6 +1,7 @@
 package com.dcf.IdGeneratorSpring.city;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +22,10 @@ public class CityController {
         return cityService.getCities();
     }
     @GetMapping("/cityId")
-    public void generateId(@RequestParam String city1, @RequestParam String city2) {
-        cityService.generateId(city1, city2);
+    public ResponseEntity generateId(@RequestParam String city1, @RequestParam String city2) {
+        String id = cityService.generateId(city1, city2);
         System.out.println("city1: " + city1);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
 @PostMapping
