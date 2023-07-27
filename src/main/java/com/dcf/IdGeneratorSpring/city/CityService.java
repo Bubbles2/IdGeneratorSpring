@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -184,5 +185,59 @@ public class CityService {
             return false;
         }
     }
+
+    public String generateIdThree(String city1, String city2) {
+        Optional<City> cit = cityRepository.findCityByName(city1);
+        Optional<City> citB = cityRepository.findCityByName(city2);
+        String id = "";
+        if (cit.isPresent() && citB.isPresent()) {
+            City city = cit.get();
+            City cityB = citB.get();
+            // Get the sequence number and increment
+            int sequence = getNextSequenceValue(city.getName().trim().toLowerCase() + "_sequence");
+            // Dont really need to save squence number here
+            city.setSequence(sequence);
+            cityRepository.save(city);
+            //
+            id = city.getCityCode() + "-" + String.format("%06d", city.getSequence());
+                id = id +  "-" + calcCheckSum(city.getCityCode() +  "-" + String.format("%06d", city.getSequence()));
+                id = id +  "-" + city1.trim().toLowerCase();
+                id = id +  "-" + cityB.getCityCode();
+            }
+         else {
+            City city = new City();
+            City cityB = new City();
+            if (cit.isPresent()) {
+                city = cit.get();
+            } else {
+                city = createCity(city1, "***");
+            }
+
+            if (citB.isPresent()) {
+                cityB = citB.get();
+            } else {
+                if(city2 != null) {
+                    cityB = createCity(city2, "***");
+                }
+
+            }
+            id = city.getCityCode() + "-" + String.format("%06d", city.getSequence());
+
+                id = id + "-" + calcCheckSum(city.getCityCode() + "-" + String.format("%06d", city.getSequence()));
+
+                id = id + "-" + city1.trim().toLowerCase();
+            if (city2 != null) {
+                id = id + "-" + cityB.getCityCode();
+            }
+        }
+        System.out.println("City Id: " + id);
+        //33-000009-J-bordeaux-06
+
+        String[] idComonents = id.split("-");
+
+        System.out.println("Components Array " + Arrays.toString(idComonents));
+        return id;
+    }
+
 
 }
