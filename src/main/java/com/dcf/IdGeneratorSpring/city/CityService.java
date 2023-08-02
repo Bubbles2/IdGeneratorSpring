@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CityService {
@@ -186,7 +189,7 @@ public class CityService {
         }
     }
 
-    public String generateIdThree(String city1, String city2) {
+    public String generateIdThree(String city1, String city2, String idPattern) {
         Optional<City> cit = cityRepository.findCityByName(city1);
         Optional<City> citB = cityRepository.findCityByName(city2);
         String id = "";
@@ -232,12 +235,79 @@ public class CityService {
         }
         System.out.println("City Id: " + id);
         //33-000009-J-bordeaux-06
+        String[] codeArray = {"C1", "S1","CS","CN","C2"};
 
-        String[] idComonents = id.split("-");
+        String[] idComponents = id.split("-");
 
-        System.out.println("Components Array " + Arrays.toString(idComonents));
-        return id;
+        System.out.println("Components Array " + Arrays.toString(idComponents));
+        String finalString = "";
+        try {
+            Pair<List<Integer>, List<String>> result = findPositions(codeArray, idPattern);
+
+            System.out.println("idPattern: " + idPattern);
+            System.out.println("Positions: " + result.first);
+            System.out.println("Separators: " + result.second);
+
+            finalString = createFinalString(result.first, result.second, idComponents);
+            System.out.println("Final String: " + finalString);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+             finalString = e.getMessage();
+
+        }
+        return finalString;
+    }
+
+    public static Pair<List<Integer>, List<String>> findPositions(String[] codeArray, String codeString) {
+        List<String> codes = Arrays.asList(codeArray);
+        List<Integer> positions = new ArrayList<>();
+        List<String> separators = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("([a-zA-Z0-9]{2,})([^a-zA-Z0-9])?");
+        Matcher matcher = pattern.matcher(codeString);
+
+        while (matcher.find()) {
+            String code = matcher.group(1);
+            String separator = matcher.group(2);
+
+            // Validation: Ensure the group is exactly 2 characters and exists in the codes array
+            if (code.length() != 2 || !codes.contains(code)) {
+                throw new IllegalArgumentException("Invalid pattern found: " + code);
+            }
+
+            int index = codes.indexOf(code);
+            positions.add(index);
+
+            if (separator != null) {
+                separators.add(separator);
+            }
+        }
+
+        return new Pair<>(positions, separators);
     }
 
 
+    public static String createFinalString(List<Integer> positions, List<String> separators, String[] idComponents) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < positions.size(); i++) {
+            sb.append(idComponents[positions.get(i)]);
+            if (i < separators.size()) {
+                sb.append(separators.get(i));
+            }
+        }
+        return sb.toString();
+    }
 }
+
+class Pair<T, U> {
+    public final T first;
+    public final U second;
+
+    public Pair(T first, U second) {
+        this.first = first;
+        this.second = second;
+    }
+}
+
+
+

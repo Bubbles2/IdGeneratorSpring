@@ -73,8 +73,8 @@ public class CityController {
     }
 
     @GetMapping("/cityIdThree")
-    public ResponseEntity generateIdThree(@RequestParam String city1, @RequestParam String city2) {
-        String id = cityService.generateIdThree(city1, city2);
+    public ResponseEntity generateIdThree(@RequestParam String city1,@RequestParam String  city2, @RequestParam String idPattern) {
+        String id = cityService.generateIdThree(city1, city2, idPattern);
         System.out.println("city1: " + city1);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
