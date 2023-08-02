@@ -72,6 +72,25 @@ public class CityController {
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
+ /*   We define a pattern  based on possible components.
+    C1 City 1 Code
+    CN City 1 name
+    S1 City 1 sequence
+    CS Checksum Letter
+    C2 City 2 code
+
+    We also use whatever separator or blank we use in the pattern. We validate the values used and return an error if required.
+    Below is an example of the pattern and results for
+
+    http://localhost:8080/api/v1/cityIdThree?city1=Paris&city2=Marseille>
+
+    C1-CN-S1 CS/C2     = 01-paris-000059 P/12
+    C1-S1 CS/C2 =  01-000060 W/12
+    C2 CN-C1 =  12 paris-01
+    Validation
+    C1-CN-S1 CRR/C2 = Invalid pattern found: CRR
+    C1R-CN-S1 C/C2 =  Invalid pattern found: C1R
+ */
     @GetMapping("/cityIdThree")
     public ResponseEntity generateIdThree(@RequestParam String city1,@RequestParam String  city2, @RequestParam String idPattern) {
         String id = cityService.generateIdThree(city1, city2, idPattern);
